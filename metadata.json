@@ -1,0 +1,5 @@
+{
+  "name": "Free Food Togo",
+  "description": "Une application communautaire pour les étudiants de Lomé afin de signaler et trouver des événements avec nourriture gratuite.",
+  "requestFramePermissions": ["geolocation"]
+}
