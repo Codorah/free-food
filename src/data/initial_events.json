@@ -1,54 +1,30 @@
 [
-  {
-    "name": "Conférence Tech & Pizza",
-    "location": "Auditorium de l'Université de Lomé",
-    "latitude": 6.1758,
-    "longitude": 1.2167,
-    "date": "2026-03-15",
-    "time": "14:00",
-    "type": "Conférence",
-    "food_certainty": "confirmed",
-    "description": "Une session sur le futur du web suivie d'une distribution de pizzas gratuites pour tous les participants.",
-    "poster_url": "https://picsum.photos/seed/tech/800/450",
-    "reporter_email": "admin@freefood.tg"
-  },
-  {
-    "name": "Atelier Flutter Lomé",
-    "location": "Village du Bénin",
-    "latitude": 6.1712,
-    "longitude": 1.2145,
-    "date": "2026-03-20",
-    "time": "09:00",
-    "type": "Formation",
-    "food_certainty": "probable",
-    "description": "Apprenez à coder des apps mobiles. Collation prévue à la pause.",
-    "poster_url": "https://picsum.photos/seed/flutter/800/450",
-    "reporter_email": "dev@freefood.tg"
-  },
-  {
-    "name": "Hackathon EduFast",
-    "location": "Campus Nord - Salle de conférence",
-    "latitude": 6.1820,
-    "longitude": 1.2200,
-    "date": "2026-03-25",
-    "time": "08:00",
-    "type": "Concours",
-    "food_certainty": "confirmed",
-    "description": "24h de code. Petit-déjeuner, déjeuner et dîner offerts aux participants.",
-    "poster_url": "https://picsum.photos/seed/hackathon/800/450",
-    "reporter_email": "edufast@freefood.tg"
-  },
-  {
-    "name": "Salon de l'Étudiant",
-    "location": "Foire Togo 2000",
-    "latitude": 6.1950,
-    "longitude": 1.2650,
-    "date": "2026-04-05",
-    "time": "10:00",
-    "type": "Salon",
-    "food_certainty": "unknown",
-    "description": "Découvrez les opportunités d'études. Souvent des stands avec des dégustations gratuites.",
-    "poster_url": "https://picsum.photos/seed/salon/800/450",
-    "reporter_email": "contact@freefood.tg"
-  }
+    {
+        "id": 1,
+        "name": "Restes Apéritif Tech",
+        "location": "Amphi 500, Campus Nord",
+        "latitude": 6.136,
+        "longitude": 1.213,
+        "date": "2026-02-28",
+        "time": "14:30",
+        "type": "Conférence",
+        "food_certainty": "confirmed",
+        "description": "Nous avons fini la conférence, il reste beaucoup de mini-pizzas et de jus.",
+        "poster_url": "",
+        "reporter_email": "orga@techtogo.tg"
+    },
+    {
+        "id": 2,
+        "name": "Buffet Mariage",
+        "location": "Salle des fêtes Agora",
+        "latitude": 6.140,
+        "longitude": 1.210,
+        "date": "2026-02-28",
+        "time": "16:00",
+        "type": "Événement",
+        "food_certainty": "probable",
+        "description": "Vu depuis la rue, les serveurs rangent de la nourriture qui n’a pas été touchée.",
+        "poster_url": "",
+        "reporter_email": "passant@example.com"
+    }
 ]
