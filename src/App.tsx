@@ -1,17 +1,25 @@
 import { useState } from 'react';
 import { Home, Map as MapIcon, PlusCircle, MessageCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import { Toaster } from 'react-hot-toast';
 
 // Placeholders for views
 import FoodListView from './views/FoodListView';
 import MapView from './views/MapView';
 import ShareFormView from './views/ShareFormView';
 import ChatView from './views/ChatView';
+import FoodDetailView from './views/FoodDetailView';
 
-export type Tab = 'list' | 'map' | 'share' | 'chat';
+export type Tab = 'list' | 'map' | 'share' | 'chat' | 'details';
 
 function App() {
   const [activeTab, setActiveTab] = useState<Tab>('list');
+  const [activeEventId, setActiveEventId] = useState<number | null>(null);
+
+  const viewDetails = (id: number) => {
+    setActiveEventId(id);
+    setActiveTab('details');
+  };
 
   return (
     <div className="flex flex-col h-[100dvh] w-full bg-orange-50/30 overflow-hidden text-stone-900">
@@ -38,13 +46,27 @@ function App() {
             transition={{ duration: 0.2, ease: "easeOut" }}
             className="w-full h-full"
           >
-            {activeTab === 'list' && <FoodListView />}
-            {activeTab === 'map' && <MapView />}
+            {activeTab === 'list' && <FoodListView onViewDetails={viewDetails} />}
+            {activeTab === 'map' && <MapView onViewDetails={viewDetails} />}
             {activeTab === 'share' && <ShareFormView onComplete={() => setActiveTab('list')} />}
             {activeTab === 'chat' && <ChatView />}
+            {activeTab === 'details' && activeEventId && (
+              <FoodDetailView
+                eventId={activeEventId}
+                onBack={() => {
+                  setActiveTab('list');
+                  setActiveEventId(null);
+                }}
+              />
+            )}
           </motion.div>
         </AnimatePresence>
       </main>
+
+      <Toaster position="top-center" toastOptions={{
+        className: 'font-medium rounded-2xl shadow-lg border border-stone-100',
+        duration: 3000,
+      }} />
 
       {/* Bottom Navigation */}
       <nav className="glass-bottom-nav flex items-center justify-around py-3 px-4 pb-safe border-t border-stone-200 z-50">

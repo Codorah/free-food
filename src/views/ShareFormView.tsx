@@ -3,6 +3,8 @@ import { Camera, MapPin, CheckCircle, Loader2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
 import L from 'leaflet';
+import toast from 'react-hot-toast';
+import { useQueryClient } from '@tanstack/react-query';
 
 const customMarkerIcon = L.divIcon({
     className: 'custom-pin',
@@ -27,9 +29,11 @@ function LocationSelector({ onLocationSelect }: { onLocationSelect: (lat: number
 export default function ShareFormView({ onComplete }: { onComplete: () => void }) {
     const [step, setStep] = useState(1);
     const [loading, setLoading] = useState(false);
+    const queryClient = useQueryClient();
 
     // Form state
     const [name, setName] = useState('');
+    const [description, setDescription] = useState('');
     const [locationName, setLocationName] = useState('');
     const [coords, setCoords] = useState<{ lat: number, lng: number } | null>(null);
     const [certainty, setCertainty] = useState('unknown');
@@ -57,11 +61,12 @@ export default function ShareFormView({ onComplete }: { onComplete: () => void }
                 posterUrl = imgData.url;
             }
 
-            await fetch('/api/events', {
+            const res = await fetch('/api/events', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     name: name || "Nourriture Gratuite",
+                    description: description || null,
                     location: locationName || "Lomé",
                     latitude: coords?.lat,
                     longitude: coords?.lng,
@@ -69,15 +74,22 @@ export default function ShareFormView({ onComplete }: { onComplete: () => void }
                     time: new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }),
                     type: 'Divers',
                     food_certainty: certainty,
-                    poster_url: posterUrl,
+                    poster_url: posterUrl || null,
                     reporter_email: 'anonymous@freefood.tg'
                 })
             });
 
-            setStep(4); // Success step
+            if (!res.ok) throw new Error("Erreur serveur");
+
+            // Invalidate events list cache
+            queryClient.invalidateQueries({ queryKey: ['events'] });
+
+            toast.success("Bon plan validé ! Merci.");
+            onComplete(); // Instantly redirect to menu (liste)
+
         } catch (err) {
             console.error(err);
-            alert("Erreur lors de l'envoi");
+            toast.error("Échec de la publication.");
         } finally {
             setLoading(false);
         }
@@ -105,9 +117,17 @@ export default function ShareFormView({ onComplete }: { onComplete: () => void }
                                 <input
                                     type="text"
                                     placeholder="Ex: Restes de pizza (Conférence tech)"
-                                    className="w-full bg-stone-50 border border-stone-200 rounded-2xl px-4 py-4 text-stone-800 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:bg-white transition-all shadow-inner"
+                                    className="w-full bg-stone-50 border border-stone-200 rounded-2xl px-4 py-4 text-stone-800 focus:outline-none focus:ring-2 focus:ring-orange-500 transition-all shadow-inner mb-4"
                                     value={name}
                                     onChange={(e) => setName(e.target.value)}
+                                />
+
+                                <label className="block text-sm font-bold text-stone-700 mb-2">Description / Infos</label>
+                                <textarea
+                                    placeholder="Ex: Demandez à voir M. Koffi, c'est dans des belles assiettes."
+                                    className="w-full h-24 bg-stone-50 border border-stone-200 rounded-2xl px-4 py-4 text-stone-800 focus:outline-none focus:ring-2 focus:ring-orange-500 transition-all shadow-inner resize-none"
+                                    value={description}
+                                    onChange={(e) => setDescription(e.target.value)}
                                 />
                             </div>
 
@@ -132,9 +152,10 @@ export default function ShareFormView({ onComplete }: { onComplete: () => void }
                             <button
                                 disabled={!name}
                                 onClick={() => setStep(2)}
-                                className="w-full bg-stone-900 text-white font-bold py-4 rounded-2xl mt-4 disabled:opacity-50 disabled:cursor-not-allowed transform active:scale-[0.98] transition-all"
+                                className="w-full bg-stone-900 text-white font-bold py-4 rounded-2xl mt-4 disabled:opacity-50 disabled:cursor-not-allowed transform active:scale-[0.98] transition-all relative overflow-hidden group"
                             >
-                                Continuer
+                                <span className="relative z-10">Continuer</span>
+                                <div className="absolute inset-0 h-full w-full bg-stone-800 scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-300"></div>
                             </button>
                         </motion.div>
                     )}
@@ -146,7 +167,7 @@ export default function ShareFormView({ onComplete }: { onComplete: () => void }
                                 <input
                                     type="text"
                                     placeholder="Nom du lieu (ex: Salle 204)"
-                                    className="w-full bg-stone-50 border border-stone-200 rounded-2xl px-4 py-4 mb-4 text-stone-800 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:bg-white shadow-inner"
+                                    className="w-full bg-stone-50 border border-stone-200 rounded-2xl px-4 py-4 mb-4 text-stone-800 focus:outline-none focus:ring-2 focus:ring-orange-500 shadow-inner"
                                     value={locationName}
                                     onChange={(e) => setLocationName(e.target.value)}
                                 />
@@ -191,10 +212,15 @@ export default function ShareFormView({ onComplete }: { onComplete: () => void }
                                         <div
                                             key={opt.id}
                                             onClick={() => setCertainty(opt.id)}
-                                            className={`p-4 rounded-2xl border-2 cursor-pointer transition-all \${certainty === opt.id ? opt.color : 'border-stone-100 hover:border-stone-300 bg-white'}`}
+                                            className={`p-4 rounded-2xl border-2 cursor-pointer transition-all flex items-center gap-4 \${certainty === opt.id ? opt.color : 'border-stone-100 hover:border-stone-300 bg-white'}`}
                                         >
-                                            <div className="font-bold mb-1">{opt.label}</div>
-                                            <div className="text-xs opacity-80">{opt.desc}</div>
+                                            <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center \${certainty === opt.id ? 'border-current' : 'border-stone-300'}`}>
+                                                {certainty === opt.id && <div className="w-2.5 h-2.5 rounded-full bg-current" />}
+                                            </div>
+                                            <div>
+                                                <div className="font-bold mb-0.5">{opt.label}</div>
+                                                <div className="text-xs opacity-80">{opt.desc}</div>
+                                            </div>
                                         </div>
                                     ))}
                                 </div>
@@ -207,30 +233,15 @@ export default function ShareFormView({ onComplete }: { onComplete: () => void }
                                 <button
                                     onClick={submitForm}
                                     disabled={loading}
-                                    className="flex-1 flex items-center justify-center bg-orange-600 text-white font-bold py-4 rounded-2xl transform active:scale-[0.98] transition-all shadow-lg shadow-orange-500/30"
+                                    className="flex-1 flex items-center justify-center bg-orange-600 text-white font-bold py-4 rounded-2xl transform active:scale-[0.98] transition-all shadow-lg shadow-orange-500/30 overflow-hidden relative"
                                 >
-                                    {loading ? <Loader2 className="animate-spin" /> : "Publier l'annonce"}
+                                    {loading ? <Loader2 className="animate-spin relative z-10" /> : <span className="relative z-10">Publier l'annonce</span>}
+                                    <div className="absolute inset-0 h-full w-full bg-gradient-to-r from-orange-500 to-amber-500"></div>
                                 </button>
                             </div>
                         </motion.div>
                     )}
 
-                    {step === 4 && (
-                        <motion.div key="step4" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="flex flex-col items-center justify-center text-center h-full pt-12 space-y-4">
-                            <div className="w-24 h-24 bg-green-100 text-green-500 rounded-full flex items-center justify-center mb-4">
-                                <CheckCircle size={48} />
-                            </div>
-                            <h3 className="text-2xl font-black text-stone-800">C'est en ligne !</h3>
-                            <p className="text-stone-500">Merci de lutter contre le gaspillage et d'aider la communauté à Lomé.</p>
-
-                            <button
-                                onClick={onComplete}
-                                className="mt-8 bg-stone-100 hover:bg-stone-200 text-stone-800 font-bold py-4 px-8 rounded-2xl transition-all"
-                            >
-                                Retour à la liste
-                            </button>
-                        </motion.div>
-                    )}
                 </AnimatePresence>
             </div>
         </div>

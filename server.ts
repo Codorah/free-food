@@ -158,11 +158,28 @@ async function createServer() {
 
   app.post("/api/events", (req, res) => {
     const { name, location, latitude, longitude, date, time, type, food_certainty, description, poster_url, reporter_email } = req.body;
-    const info = db.prepare(`
-      INSERT INTO events (name, location, latitude, longitude, date, time, type, food_certainty, description, poster_url, reporter_email)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `).run(name, location, latitude, longitude, date, time, type, food_certainty, description, poster_url, reporter_email);
-    res.json({ id: info.lastInsertRowid });
+    try {
+      const info = db.prepare(`
+        INSERT INTO events (name, location, latitude, longitude, date, time, type, food_certainty, description, poster_url, reporter_email)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `).run(
+        name,
+        location,
+        latitude,
+        longitude,
+        date,
+        time,
+        type || 'Divers',
+        food_certainty || 'unknown',
+        description ?? null,
+        poster_url ?? null,
+        reporter_email ?? null
+      );
+      res.json({ id: info.lastInsertRowid });
+    } catch (err: any) {
+      console.error("Save Event Error:", err);
+      res.status(500).json({ error: "Failed to save event", details: err.message });
+    }
   });
 
   app.post("/api/events/:id/join", (req, res) => {

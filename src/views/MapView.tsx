@@ -5,22 +5,28 @@ import 'leaflet/dist/leaflet.css';
 import { MapPin, Navigation, Map } from 'lucide-react';
 
 // Custom Map Marker Icon
-const icon = L.divIcon({
-    className: 'custom-marker',
-    html: `
-    <div class="relative flex items-center justify-center w-10 h-10">
-      <div class="absolute inset-0 bg-orange-500 rounded-full opacity-30 animate-ping"></div>
-      <div class="relative z-10 w-8 h-8 flex items-center justify-center bg-orange-600 rounded-full border-2 border-white shadow-lg text-white font-bold text-xs">
-        FF
-      </div>
-    </div>
-  `,
-    iconSize: [40, 40],
-    iconAnchor: [20, 20],
-    popupAnchor: [0, -20]
-});
+const getIcon = (certainty: string) => {
+    const colorClass = certainty === 'confirmed' ? 'bg-green-500' :
+        certainty === 'probable' ? 'bg-amber-500' :
+            'bg-stone-500';
 
-export default function MapView() {
+    return L.divIcon({
+        className: 'custom-marker',
+        html: `
+      <div class="relative flex items-center justify-center w-10 h-10">
+        <div class="absolute inset-0 \${colorClass} rounded-full opacity-30 animate-ping"></div>
+        <div class="relative z-10 w-8 h-8 flex items-center justify-center \${colorClass} rounded-full border-2 border-white shadow-lg text-white font-bold text-xs">
+          FF
+        </div>
+      </div>
+    `,
+        iconSize: [40, 40],
+        iconAnchor: [20, 20],
+        popupAnchor: [0, -20]
+    });
+};
+
+export default function MapView({ onViewDetails }: { onViewDetails: (id: number) => void }) {
     const [events, setEvents] = useState<any[]>([]);
     const [mapCenter, setMapCenter] = useState<[number, number]>([6.13748, 1.21200]); // Lomé center
     const [isLocating, setIsLocating] = useState(false);
@@ -71,7 +77,7 @@ export default function MapView() {
 
                 {events.map((evt) => (
                     evt.latitude && evt.longitude && (
-                        <Marker key={evt.id} position={[evt.latitude, evt.longitude]} icon={icon}>
+                        <Marker key={evt.id} position={[evt.latitude, evt.longitude]} icon={getIcon(evt.food_certainty)}>
                             <Popup className="food-popup rounded-2xl overflow-hidden border-0">
                                 <div className="p-1 min-w-[200px]">
                                     <h3 className="font-bold text-lg mb-1">{evt.name}</h3>
@@ -91,7 +97,10 @@ export default function MapView() {
                                         </span>
                                     </div>
 
-                                    <button className="w-full bg-orange-600 outline-none text-white text-xs font-bold py-2 rounded-xl mt-1">
+                                    <button
+                                        onClick={() => onViewDetails(evt.id)}
+                                        className="w-full bg-orange-600 outline-none text-white text-xs font-bold py-2 rounded-xl mt-1 active:scale-95 transition-transform"
+                                    >
                                         Voir détails
                                     </button>
                                 </div>
