@@ -203,6 +203,17 @@ async function createServer() {
     res.json({ success: true });
   });
 
+  // Catch-all for undefined API routes to prevent falling through to the SPA index.html
+  app.all("/api/*", (req, res) => {
+    res.status(404).json({ error: "API endpoint not found" });
+  });
+
+  // Global error handler for API routes to avoid returning Express default HTML error pages
+  app.use("/api", (err: any, req: any, res: any, next: any) => {
+    console.error("API Error:", err);
+    res.status(500).json({ error: "Internal Server Error" });
+  });
+
   // Vite middleware for development
   if (process.env.NODE_ENV !== "production" && !process.env.VERCEL) {
     const vite = await createViteServer({

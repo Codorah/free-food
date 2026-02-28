@@ -39,17 +39,6 @@ L.Marker.prototype.options.icon = DefaultIcon;
 const USER_EMAIL = "student@univ-lome.tg";
 const LOME_CENTER: [number, number] = [6.1725, 1.2314];
 
-const MapCleanup = () => {
-  const map = useMap();
-  useEffect(() => {
-    return () => {
-      map.off();
-      map.remove();
-    };
-  }, [map]);
-  return null;
-};
-
 function SafeMap({
   center,
   zoom,
@@ -65,12 +54,13 @@ function SafeMap({
   className?: string;
   [key: string]: any;
 }) {
+  const [mountId] = useState(() => Math.random().toString(36).substring(7));
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
     const timer = setTimeout(() => setReady(true), 50);
     return () => clearTimeout(timer);
-  }, [mapKey]);
+  }, []);
 
   if (!ready) {
     return (
@@ -81,17 +71,18 @@ function SafeMap({
   }
 
   return (
-    <MapContainer
-      key={mapKey}
-      center={center}
-      zoom={zoom}
-      className={className}
-      {...props}
-    >
-      <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-      {children}
-      <MapCleanup />
-    </MapContainer>
+    <div className={className}>
+      <MapContainer
+        key={`${mapKey}-${mountId}`}
+        center={center}
+        zoom={zoom}
+        style={{ height: '100%', width: '100%', zIndex: 0 }}
+        {...props}
+      >
+        <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+        {children}
+      </MapContainer>
+    </div>
   );
 }
 
@@ -105,6 +96,12 @@ function AppContent() {
   const navigate = useNavigate();
   const location = useLocation();
 
+  // For keeping scroll/state across views, we'll render views side by side and hide via CSS instead of Route unmounting for the main list vs map.
+  const isListView = location.pathname === '/';
+  const isMapView = location.pathname === '/map';
+  const showMainViews = isListView || isMapView;
+
+  // Remove duplicate hook initializations
   useEffect(() => {
     fetchEvents();
   }, []);
@@ -196,200 +193,11 @@ function AppContent() {
           </div>
         </div>
       </header>
-      <main className="max-w-2xl mx-auto p-4">
+
+      <main className="max-w-2xl mx-auto p-4 relative z-10">
         <Routes>
-          <Route path="/" element={
-            <div className="space-y-6">
-              <div className="space-y-4">
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400" size={18} />
-                  <input
-                    type="text"
-                    placeholder="Rechercher un événement..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full pl-10 pr-4 py-3 bg-white border border-stone-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all shadow-sm"
-                  />
-                </div>
-
-                <div className="flex flex-col gap-3">
-                  <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
-                    {eventTypes.map((type) => (
-                      <button
-                        key={type}
-                        onClick={() => setFilterType(type)}
-                        className={`px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider whitespace-nowrap transition-all border ${filterType === type
-                          ? 'bg-emerald-600 text-white border-emerald-600 shadow-md shadow-emerald-100'
-                          : 'bg-white text-stone-500 border-stone-200 hover:border-emerald-200'
-                          }`}
-                      >
-                        {type === 'all' ? 'Tous les types' : type}
-                      </button>
-                    ))}
-                  </div>
-
-                  <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
-                    {[
-                      { id: 'all', label: 'Toutes certitudes' },
-                      { id: 'confirmed', label: 'Confirmé ✅' },
-                      { id: 'probable', label: 'Probable ⏳' },
-                      { id: 'unknown', label: 'Inconnu ❓' }
-                    ].map((opt) => (
-                      <button
-                        key={opt.id}
-                        onClick={() => setFilterCertainty(opt.id)}
-                        className={`px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider whitespace-nowrap transition-all border ${filterCertainty === opt.id
-                          ? 'bg-stone-900 text-white border-stone-900 shadow-md shadow-stone-200'
-                          : 'bg-white text-stone-500 border-stone-200 hover:border-stone-300'
-                          }`}
-                      >
-                        {opt.label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-                <button
-                  onClick={() => {
-                    navigator.geolocation.getCurrentPosition(
-                      (pos) => setUserLocation([pos.coords.latitude, pos.coords.longitude]),
-                      () => alert("Impossible d'obtenir la position")
-                    );
-                  }}
-                  className="w-full py-3 bg-emerald-100 text-emerald-700 rounded-xl font-bold text-sm flex items-center justify-center gap-2"
-                >
-                  <Navigation size={18} />
-                  Afficher près de moi (5km)
-                </button>
-              </div>
-              <div className="space-y-4">
-                {loading ? (
-                  Array(3).fill(0).map((_, i) => (
-                    <div key={i} className="h-40 bg-stone-200 animate-pulse rounded-3xl" />
-                  ))
-                ) : filteredEvents.length > 0 ? (
-                  filteredEvents.map((event) => (
-                    <EventCard
-                      key={event.id}
-                      event={event}
-                      onClick={() => navigate(`/event/${event.id}`)}
-                    />
-                  ))
-                ) : (
-                  <div className="text-center py-20 text-stone-500 bg-white rounded-3xl border border-stone-100 shadow-sm">
-                    <Utensils size={48} className="mx-auto mb-4 opacity-20" />
-                    <p className="mb-4">Aucun événement ne correspond à vos critères.</p>
-                    <button
-                      onClick={() => {
-                        setSearchQuery('');
-                        setFilterType('all');
-                        setFilterCertainty('all');
-                      }}
-                      className="px-6 py-2 bg-emerald-50 text-emerald-600 rounded-xl font-bold text-sm hover:bg-emerald-100 transition-colors"
-                    >
-                      Réinitialiser les filtres
-                    </button>
-                  </div>
-                )}
-              </div>
-            </div>
-          } />
-
-          <Route path="/map" element={
-            <div className="space-y-6">
-              <div className="space-y-4">
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400" size={18} />
-                  <input
-                    type="text"
-                    placeholder="Rechercher un événement..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full pl-10 pr-4 py-3 bg-white border border-stone-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all shadow-sm"
-                  />
-                </div>
-                <div className="flex flex-col gap-3">
-                  <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
-                    {eventTypes.map((type) => (
-                      <button
-                        key={type}
-                        onClick={() => setFilterType(type)}
-                        className={`px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider whitespace-nowrap transition-all border ${filterType === type
-                          ? 'bg-emerald-600 text-white border-emerald-600 shadow-md shadow-emerald-100'
-                          : 'bg-white text-stone-500 border-stone-200 hover:border-emerald-200'
-                          }`}
-                      >
-                        {type === 'all' ? 'Tous les types' : type}
-                      </button>
-                    ))}
-                  </div>
-
-                  <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
-                    {[
-                      { id: 'all', label: 'Toutes certitudes' },
-                      { id: 'confirmed', label: 'Confirmé ✅' },
-                      { id: 'probable', label: 'Probable ⏳' },
-                      { id: 'unknown', label: 'Inconnu ❓' }
-                    ].map((opt) => (
-                      <button
-                        key={opt.id}
-                        onClick={() => setFilterCertainty(opt.id)}
-                        className={`px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider whitespace-nowrap transition-all border ${filterCertainty === opt.id
-                          ? 'bg-stone-900 text-white border-stone-900 shadow-md shadow-stone-200'
-                          : 'bg-white text-stone-500 border-stone-200 hover:border-stone-300'
-                          }`}
-                      >
-                        {opt.label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-                <button
-                  onClick={() => {
-                    navigator.geolocation.getCurrentPosition(
-                      (pos) => setUserLocation([pos.coords.latitude, pos.coords.longitude]),
-                      () => alert("Impossible d'obtenir la position")
-                    );
-                  }}
-                  className="w-full py-3 bg-emerald-100 text-emerald-700 rounded-xl font-bold text-sm flex items-center justify-center gap-2"
-                >
-                  <Navigation size={18} />
-                  Afficher près de moi (5km)
-                </button>
-              </div>
-              <div className="h-[60vh] w-full rounded-3xl overflow-hidden border border-stone-200 shadow-sm relative bg-stone-100">
-                <SafeMap
-                  mapKey={`main-map-${location.pathname}-${location.key}`}
-                  center={userLocation || LOME_CENTER}
-                  zoom={13}
-                  className="h-full w-full"
-                >
-                  {userLocation && <Marker position={userLocation} icon={new L.Icon({
-                    iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
-                    iconSize: [25, 41],
-                    iconAnchor: [12, 41]
-                  })} />}
-                  {filteredEvents.map(event => (
-                    event.latitude && event.longitude && (
-                      <Marker key={event.id} position={[event.latitude, event.longitude]}>
-                        <Popup>
-                          <div className="p-1">
-                            <h4 className="font-bold text-sm mb-1">{event.name}</h4>
-                            <p className="text-[10px] text-stone-500 mb-2">{event.location}</p>
-                            <button
-                              onClick={() => navigate(`/event/${event.id}`)}
-                              className="text-[10px] font-bold text-emerald-600 uppercase tracking-wider"
-                            >
-                              Voir détails
-                            </button>
-                          </div>
-                        </Popup>
-                      </Marker>
-                    )
-                  ))}
-                </SafeMap>
-              </div>
-            </div>
-          } />
+          <Route path="/" element={null} />
+          <Route path="/map" element={null} />
           <Route path="/add" element={
             <AddEventScreen onBack={() => navigate(-1)} onSubmit={handleAddEvent} />
           } />
@@ -400,7 +208,140 @@ function AppContent() {
             <ChatScreen onBack={() => navigate(-1)} />
           } />
         </Routes>
+
+        {showMainViews && (
+          <div className="space-y-6">
+            <div className="space-y-4">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400" size={18} />
+                <input
+                  type="text"
+                  placeholder="Rechercher un événement..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full pl-10 pr-4 py-3 bg-white border border-stone-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all shadow-sm"
+                />
+              </div>
+
+              <div className="flex flex-col gap-3">
+                <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
+                  {eventTypes.map((type) => (
+                    <button
+                      key={type}
+                      onClick={() => setFilterType(type)}
+                      className={`px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider whitespace-nowrap transition-all border ${filterType === type
+                        ? 'bg-emerald-600 text-white border-emerald-600 shadow-md shadow-emerald-100'
+                        : 'bg-white text-stone-500 border-stone-200 hover:border-emerald-200'
+                        }`}
+                    >
+                      {type === 'all' ? 'Tous les types' : type}
+                    </button>
+                  ))}
+                </div>
+
+                <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
+                  {[
+                    { id: 'all', label: 'Toutes certitudes' },
+                    { id: 'confirmed', label: 'Confirmé ✅' },
+                    { id: 'probable', label: 'Probable ⏳' },
+                    { id: 'unknown', label: 'Inconnu ❓' }
+                  ].map((opt) => (
+                    <button
+                      key={opt.id}
+                      onClick={() => setFilterCertainty(opt.id)}
+                      className={`px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider whitespace-nowrap transition-all border ${filterCertainty === opt.id
+                        ? 'bg-stone-900 text-white border-stone-900 shadow-md shadow-stone-200'
+                        : 'bg-white text-stone-500 border-stone-200 hover:border-stone-300'
+                        }`}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <button
+                onClick={() => {
+                  navigator.geolocation.getCurrentPosition(
+                    (pos) => setUserLocation([pos.coords.latitude, pos.coords.longitude]),
+                    () => alert("Impossible d'obtenir la position")
+                  );
+                }}
+                className="w-full py-3 bg-emerald-100 text-emerald-700 rounded-xl font-bold text-sm flex items-center justify-center gap-2"
+              >
+                <Navigation size={18} />
+                Afficher près de moi (5km)
+              </button>
+            </div>
+
+            {/* List View */}
+            <div className={`space-y-4 ${isListView ? 'block' : 'hidden'}`}>
+              {loading ? (
+                Array(3).fill(0).map((_, i) => (
+                  <div key={i} className="h-40 bg-stone-200 animate-pulse rounded-3xl" />
+                ))
+              ) : filteredEvents.length > 0 ? (
+                filteredEvents.map((event) => (
+                  <EventCard
+                    key={event.id}
+                    event={event}
+                    onClick={() => navigate(`/event/${event.id}`)}
+                  />
+                ))
+              ) : (
+                <div className="text-center py-20 text-stone-500 bg-white rounded-3xl border border-stone-100 shadow-sm">
+                  <Utensils size={48} className="mx-auto mb-4 opacity-20" />
+                  <p className="mb-4">Aucun événement ne correspond à vos critères.</p>
+                  <button
+                    onClick={() => {
+                      setSearchQuery('');
+                      setFilterType('all');
+                      setFilterCertainty('all');
+                    }}
+                    className="px-6 py-2 bg-emerald-50 text-emerald-600 rounded-xl font-bold text-sm hover:bg-emerald-100 transition-colors"
+                  >
+                    Réinitialiser les filtres
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Map View */}
+            <div className={`h-[60vh] w-full rounded-3xl overflow-hidden border border-stone-200 shadow-sm relative bg-stone-100 ${isMapView ? 'block' : 'hidden'}`}>
+              <SafeMap
+                mapKey={`main-map-instance`}
+                center={userLocation || LOME_CENTER}
+                zoom={13}
+                className="h-full w-full"
+              >
+                {userLocation && <Marker position={userLocation} icon={new L.Icon({
+                  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+                  iconSize: [25, 41],
+                  iconAnchor: [12, 41]
+                })} />}
+                {filteredEvents.map(event => (
+                  event.latitude && event.longitude && (
+                    <Marker key={event.id} position={[event.latitude, event.longitude]}>
+                      <Popup>
+                        <div className="p-1">
+                          <h4 className="font-bold text-sm mb-1">{event.name}</h4>
+                          <p className="text-[10px] text-stone-500 mb-2">{event.location}</p>
+                          <button
+                            onClick={() => navigate(`/event/${event.id}`)}
+                            className="text-[10px] font-bold text-emerald-600 uppercase tracking-wider"
+                          >
+                            Voir détails
+                          </button>
+                        </div>
+                      </Popup>
+                    </Marker>
+                  )
+                ))}
+              </SafeMap>
+            </div>
+          </div>
+        )}
       </main>
+
       {/* Bottom Nav */}
       <nav className="fixed bottom-6 left-1/2 -translate-x-1/2 w-[90%] max-w-sm glass rounded-full border border-white/40 px-6 py-4 flex justify-between items-center shadow-2xl shadow-emerald-900/5 z-[100]">
         <Link to="/" className={`flex flex-col items-center gap-1 transition-all ${location.pathname === '/' ? 'text-emerald-600 scale-110' : 'text-stone-400 hover:text-stone-600'}`}>
