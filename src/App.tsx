@@ -140,8 +140,8 @@ function AppContent() {
 
   const filteredEvents = events.filter(e => {
     const matchesSearch = e.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         e.location.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         (e.description && e.description.toLowerCase().includes(searchQuery.toLowerCase()));
+      e.location.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (e.description && e.description.toLowerCase().includes(searchQuery.toLowerCase()));
     const matchesType = filterType === 'all' || e.type === filterType;
     const matchesCertainty = filterCertainty === 'all' || e.food_certainty === filterCertainty;
     let matchesLocation = true;
@@ -211,24 +211,23 @@ function AppContent() {
                     className="w-full pl-10 pr-4 py-3 bg-white border border-stone-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all shadow-sm"
                   />
                 </div>
-               
+
                 <div className="flex flex-col gap-3">
                   <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
                     {eventTypes.map((type) => (
                       <button
                         key={type}
                         onClick={() => setFilterType(type)}
-                        className={`px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider whitespace-nowrap transition-all border ${
-                          filterType === type
-                            ? 'bg-emerald-600 text-white border-emerald-600 shadow-md shadow-emerald-100'
-                            : 'bg-white text-stone-500 border-stone-200 hover:border-emerald-200'
-                        }`}
+                        className={`px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider whitespace-nowrap transition-all border ${filterType === type
+                          ? 'bg-emerald-600 text-white border-emerald-600 shadow-md shadow-emerald-100'
+                          : 'bg-white text-stone-500 border-stone-200 hover:border-emerald-200'
+                          }`}
                       >
                         {type === 'all' ? 'Tous les types' : type}
                       </button>
                     ))}
                   </div>
-                 
+
                   <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
                     {[
                       { id: 'all', label: 'Toutes certitudes' },
@@ -239,11 +238,10 @@ function AppContent() {
                       <button
                         key={opt.id}
                         onClick={() => setFilterCertainty(opt.id)}
-                        className={`px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider whitespace-nowrap transition-all border ${
-                          filterCertainty === opt.id
-                            ? 'bg-stone-900 text-white border-stone-900 shadow-md shadow-stone-200'
-                            : 'bg-white text-stone-500 border-stone-200 hover:border-stone-300'
-                        }`}
+                        className={`px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider whitespace-nowrap transition-all border ${filterCertainty === opt.id
+                          ? 'bg-stone-900 text-white border-stone-900 shadow-md shadow-stone-200'
+                          : 'bg-white text-stone-500 border-stone-200 hover:border-stone-300'
+                          }`}
                       >
                         {opt.label}
                       </button>
@@ -295,7 +293,7 @@ function AppContent() {
               </div>
             </div>
           } />
-         
+
           <Route path="/map" element={
             <div className="space-y-6">
               <div className="space-y-4">
@@ -315,17 +313,16 @@ function AppContent() {
                       <button
                         key={type}
                         onClick={() => setFilterType(type)}
-                        className={`px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider whitespace-nowrap transition-all border ${
-                          filterType === type
-                            ? 'bg-emerald-600 text-white border-emerald-600 shadow-md shadow-emerald-100'
-                            : 'bg-white text-stone-500 border-stone-200 hover:border-emerald-200'
-                        }`}
+                        className={`px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider whitespace-nowrap transition-all border ${filterType === type
+                          ? 'bg-emerald-600 text-white border-emerald-600 shadow-md shadow-emerald-100'
+                          : 'bg-white text-stone-500 border-stone-200 hover:border-emerald-200'
+                          }`}
                       >
                         {type === 'all' ? 'Tous les types' : type}
                       </button>
                     ))}
                   </div>
-                 
+
                   <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
                     {[
                       { id: 'all', label: 'Toutes certitudes' },
@@ -336,11 +333,10 @@ function AppContent() {
                       <button
                         key={opt.id}
                         onClick={() => setFilterCertainty(opt.id)}
-                        className={`px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider whitespace-nowrap transition-all border ${
-                          filterCertainty === opt.id
-                            ? 'bg-stone-900 text-white border-stone-900 shadow-md shadow-stone-200'
-                            : 'bg-white text-stone-500 border-stone-200 hover:border-stone-300'
-                        }`}
+                        className={`px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider whitespace-nowrap transition-all border ${filterCertainty === opt.id
+                          ? 'bg-stone-900 text-white border-stone-900 shadow-md shadow-stone-200'
+                          : 'bg-white text-stone-500 border-stone-200 hover:border-stone-300'
+                          }`}
                       >
                         {opt.label}
                       </button>
@@ -406,17 +402,17 @@ function AppContent() {
         </Routes>
       </main>
       {/* Bottom Nav */}
-      <nav className="fixed bottom-0 left-0 right-0 glass border-t border-stone-200 px-6 py-3 flex justify-around items-center">
-        <Link to="/" className={`flex flex-col items-center gap-1 ${location.pathname === '/' ? 'text-emerald-600' : 'text-stone-400'}`}>
-          <Calendar size={20} />
-          <span className="text-[10px] font-bold uppercase tracking-wider">Events</span>
+      <nav className="fixed bottom-6 left-1/2 -translate-x-1/2 w-[90%] max-w-sm glass rounded-full border border-white/40 px-6 py-4 flex justify-between items-center shadow-2xl shadow-emerald-900/5 z-[100]">
+        <Link to="/" className={`flex flex-col items-center gap-1 transition-all ${location.pathname === '/' ? 'text-emerald-600 scale-110' : 'text-stone-400 hover:text-stone-600'}`}>
+          <Calendar size={20} strokeWidth={location.pathname === '/' ? 2.5 : 2} />
+          <span className="text-[10px] items-center font-bold uppercase tracking-wider">Events</span>
         </Link>
-        <Link to="/add" className="w-12 h-12 -mt-8 bg-emerald-600 rounded-2xl flex items-center justify-center text-white shadow-xl shadow-emerald-200 border-4 border-stone-50">
-          <Plus size={24} />
+        <Link to="/add" className="w-14 h-14 bg-gradient-to-br from-emerald-400 to-teal-600 rounded-full flex items-center justify-center text-white shadow-xl shadow-emerald-200 border-4 border-white/50 hover:scale-110 transition-transform -mt-10">
+          <Plus size={28} strokeWidth={2.5} />
         </Link>
-        <Link to="/map" className={`flex flex-col items-center gap-1 ${location.pathname === '/map' ? 'text-emerald-600' : 'text-stone-400'}`}>
-          <MapIcon size={20} />
-          <span className="text-[10px] font-bold uppercase tracking-wider">Carte</span>
+        <Link to="/map" className={`flex flex-col items-center gap-1 transition-all ${location.pathname === '/map' ? 'text-emerald-600 scale-110' : 'text-stone-400 hover:text-stone-600'}`}>
+          <MapIcon size={20} strokeWidth={location.pathname === '/map' ? 2.5 : 2} />
+          <span className="text-[10px] items-center font-bold uppercase tracking-wider">Carte</span>
         </Link>
       </nav>
     </div>
@@ -529,7 +525,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, onClick }) => {
       whileHover={{ y: -4 }}
       whileTap={{ scale: 0.98 }}
       onClick={onClick}
-      className="bg-white rounded-[32px] overflow-hidden border border-stone-100 shadow-sm cursor-pointer group"
+      className="bg-white rounded-[32px] overflow-hidden border border-stone-100 shadow-xl shadow-stone-200/40 cursor-pointer group"
     >
       <div className="relative aspect-[16/9] overflow-hidden">
         <img
@@ -540,42 +536,37 @@ const EventCard: React.FC<EventCardProps> = ({ event, onClick }) => {
             e.currentTarget.src = `https://picsum.photos/seed/${event.id}/800/450?blur=2`;
           }}
         />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20" />
         <div className="absolute top-4 left-4">
-          <div className={`px-3 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider flex items-center gap-1.5 shadow-lg ${certaintyColors[event.food_certainty]}`}>
+          <div className={`px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider flex items-center gap-1.5 shadow-lg ${certaintyColors[event.food_certainty]}`}>
             <CheckCircle2 size={12} />
             {certaintyLabels[event.food_certainty]}
           </div>
         </div>
         {event.type && (
           <div className="absolute top-4 right-4">
-            <div className="px-3 py-1 bg-black/40 backdrop-blur-md text-white text-[10px] font-bold uppercase tracking-wider rounded-lg border border-white/20">
+            <div className="px-3 py-1.5 bg-white/20 backdrop-blur-md text-white text-[10px] font-bold uppercase tracking-wider rounded-full border border-white/30">
               {event.type}
             </div>
           </div>
         )}
-      </div>
-      <div className="p-6">
-        <h3 className="font-display font-bold text-xl mb-3 text-stone-900 group-hover:text-emerald-600 transition-colors leading-tight">{event.name}</h3>
-       
-        <div className="space-y-2.5">
-          <div className="flex items-center gap-2.5 text-stone-500 text-sm font-medium">
-            <div className="w-5 h-5 flex items-center justify-center text-emerald-500">
-              <MapPin size={16} />
-            </div>
-            <span>{event.location}</span>
-          </div>
-          <div className="flex items-center gap-2.5 text-stone-500 text-sm font-medium">
-            <div className="w-5 h-5 flex items-center justify-center text-emerald-500">
-              <Calendar size={16} />
-            </div>
-            <span>{new Date(event.date).toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })} at {event.time || 'TBA'}</span>
+        <div className="absolute bottom-4 left-4 right-4 text-white">
+          <h3 className="font-display font-bold text-2xl mb-1 leading-tight drop-shadow-md">{event.name}</h3>
+          <div className="flex items-center gap-2 text-white/90 text-xs font-semibold">
+            <MapPin size={14} />
+            <span className="truncate drop-shadow-sm">{event.location}</span>
           </div>
         </div>
-        <div className="mt-6 pt-5 border-t border-stone-50 flex items-center justify-between">
-          <button className="text-sm font-bold text-stone-900 flex items-center gap-1 hover:text-emerald-600 transition-colors">
-            View Details <ChevronRight size={16} className="mt-0.5" />
-          </button>
-          <div className="flex items-center gap-1.5 text-stone-400 text-xs font-bold uppercase tracking-wider">
+      </div>
+      <div className="p-5 flex items-center justify-between bg-white">
+        <div className="flex items-center gap-4 text-stone-500 text-sm font-medium">
+          <div className="flex items-center gap-1.5 bg-stone-50 px-3 py-1.5 rounded-full">
+            <Calendar size={14} className="text-emerald-500" />
+            <span className="text-xs">{new Date(event.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} at {event.time || 'TBA'}</span>
+          </div>
+        </div>
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-1.5 text-stone-400 text-xs font-bold bg-stone-50 px-3 py-1.5 rounded-full">
             <Users size={14} />
             <span>{event.participant_count}</span>
           </div>
@@ -651,11 +642,10 @@ function ChatScreen({ onBack }: { onBack: () => void }) {
         ) : (
           messages.map((m) => (
             <div key={m.id} className={`flex flex-col ${m.user_email === USER_EMAIL ? 'items-end' : 'items-start'}`}>
-              <div className={`max-w-[85%] p-4 rounded-2xl text-sm shadow-sm ${
-                m.user_email === USER_EMAIL
-                  ? 'bg-white text-stone-800 rounded-tr-none border border-emerald-100'
-                  : 'bg-white text-stone-800 rounded-tl-none border border-stone-100'
-              }`}>
+              <div className={`max-w-[85%] p-4 rounded-2xl text-sm shadow-sm ${m.user_email === USER_EMAIL
+                ? 'bg-white text-stone-800 rounded-tr-none border border-emerald-100'
+                : 'bg-white text-stone-800 rounded-tl-none border border-stone-100'
+                }`}>
                 <div className="flex items-center justify-between gap-4 mb-1.5">
                   <span className="text-[10px] font-bold text-orange-500 uppercase tracking-wider">
                     {m.user_email.split('@')[0]}
@@ -755,38 +745,51 @@ function AddEventScreen({ onBack, onSubmit }: { onBack: () => void, onSubmit: (d
     location: '',
     latitude: 0,
     longitude: 0,
-    date: '',
-    time: '',
+    date: new Date().toISOString().split('T')[0],
+    time: new Date().toTimeString().substring(0, 5),
     type: 'Club Meeting',
     food_certainty: 'probable',
     description: '',
     poster_url: '',
     estimated_until: ''
   });
+  const [isUploading, setIsUploading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const eventTypes = ['Club Meeting', 'Seminar / Talk', 'Conférence', 'Hackathon', 'Salon', 'Mariage', 'Concours', 'Meetup', 'Party / Social', 'Formation'];
+
+  const handleFormSubmit = async () => {
+    if (!formData.name || !formData.location || formData.latitude === 0 || formData.longitude === 0) {
+      alert("N'oublie pas de remplir le nom, le lieu exact, et de taper sur la carte pour choisir l'emplacement ! 🗺️");
+      return;
+    }
+    setIsSubmitting(true);
+    await onSubmit(formData);
+    setIsSubmitting(false);
+  };
+
   return (
-    <div className="space-y-8 pb-10">
+    <div className="space-y-8 pb-10 max-w-lg mx-auto md:py-8">
       <div className="flex items-center justify-between">
-        <button onClick={onBack} className="flex items-center gap-2 text-stone-900 font-bold">
+        <button onClick={onBack} className="flex items-center gap-2 text-stone-900 font-bold hover:text-emerald-600 transition-colors bg-white px-4 py-2 rounded-full shadow-sm">
           <ArrowLeft size={20} />
           <span className="text-xl font-display">Share Free Food</span>
         </button>
-        <button className="text-orange-500 font-bold text-sm">Drafts</button>
       </div>
       <div className="space-y-6">
-        <div className="bg-white p-5 rounded-[32px] border border-stone-100 shadow-sm space-y-4">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center text-orange-500">
-              <MapPin size={16} />
+        <div className="bg-white p-6 rounded-[32px] border border-stone-100 shadow-xl shadow-stone-200/50 space-y-4 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 rounded-full blur-3xl -mr-10 -mt-10"></div>
+          <div className="relative flex items-center gap-3">
+            <div className="w-10 h-10 bg-gradient-to-br from-orange-400 to-pink-500 rounded-full flex items-center justify-center text-white shadow-lg shadow-orange-200">
+              <MapPin size={18} />
             </div>
             <div>
-              <h3 className="font-bold text-sm">Where is the food?</h3>
-              <p className="text-[10px] text-stone-400">Tap on the map exactly where people can find the food.</p>
+              <h3 className="font-bold text-sm text-stone-900">Where is the food?</h3>
+              <p className="text-[11px] text-stone-500">Tap the exact location on the map 👇</p>
             </div>
           </div>
           <LocationPicker onSelect={(lat, lng) => setFormData({ ...formData, latitude: lat, longitude: lng })} />
         </div>
-        <div className="space-y-5">
+        <div className="space-y-6 bg-white p-6 rounded-[32px] border border-stone-100 shadow-xl shadow-stone-200/50">
           <div className="space-y-2">
             <label className="text-sm font-bold text-stone-900 ml-1">Location Name</label>
             <input
@@ -794,7 +797,7 @@ function AddEventScreen({ onBack, onSubmit }: { onBack: () => void, onSubmit: (d
               value={formData.location}
               onChange={e => setFormData({ ...formData, location: e.target.value })}
               placeholder="e.g., Student Union Room 204"
-              className="w-full px-5 py-4 bg-white border border-stone-100 rounded-2xl focus:ring-2 focus:ring-emerald-500/10 focus:border-emerald-500 outline-none transition-all shadow-sm placeholder:text-stone-300"
+              className="w-full px-5 py-4 bg-stone-50 border border-stone-100 rounded-2xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 focus:bg-white outline-none transition-all shadow-sm placeholder:text-stone-300"
             />
           </div>
           <div className="space-y-2">
@@ -804,57 +807,53 @@ function AddEventScreen({ onBack, onSubmit }: { onBack: () => void, onSubmit: (d
               value={formData.name}
               onChange={e => setFormData({ ...formData, name: e.target.value })}
               placeholder="e.g., Leftover pizza from CS Club"
-              className="w-full px-5 py-4 bg-white border border-stone-100 rounded-2xl focus:ring-2 focus:ring-emerald-500/10 focus:border-emerald-500 outline-none transition-all shadow-sm placeholder:text-stone-300"
+              className="w-full px-5 py-4 bg-stone-50 border border-stone-100 rounded-2xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 focus:bg-white outline-none transition-all shadow-sm placeholder:text-stone-300"
             />
           </div>
           <div className="space-y-2">
-            <label className="text-sm font-bold text-stone-900 ml-1">More details</label>
-            <textarea
-              rows={3}
-              value={formData.description}
-              onChange={e => setFormData({ ...formData, description: e.target.value })}
-              placeholder="What kind of food? How much is left? Any entry requirements?"
-              className="w-full px-5 py-4 bg-white border border-stone-100 rounded-2xl focus:ring-2 focus:ring-emerald-500/10 focus:border-emerald-500 outline-none transition-all shadow-sm placeholder:text-stone-300 resize-none"
-            />
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <label className="text-sm font-bold text-stone-900 ml-1">Date</label>
+            <label className="text-sm font-bold text-stone-900 ml-1">Event Photo</label>
+            <div className="relative w-full overflow-hidden border-2 border-dashed border-stone-200 rounded-2xl bg-stone-50 hover:bg-stone-100 focus-within:ring-2 focus-within:ring-emerald-500/20 transition-all group">
               <input
-                type="date"
-                value={formData.date}
-                onChange={e => setFormData({ ...formData, date: e.target.value })}
-                className="w-full px-5 py-4 bg-white border border-stone-100 rounded-2xl focus:ring-2 focus:ring-emerald-500/10 focus:border-emerald-500 outline-none transition-all shadow-sm"
+                type="file"
+                accept="image/*"
+                onChange={async (e) => {
+                  const file = e.target.files?.[0];
+                  if (!file) return;
+                  setIsUploading(true);
+                  const formDataObj = new FormData();
+                  formDataObj.append('image', file);
+                  try {
+                    const res = await fetch('/api/upload', {
+                      method: 'POST',
+                      body: formDataObj,
+                    });
+                    if (res.ok) {
+                      const data = await res.json();
+                      setFormData({ ...formData, poster_url: data.url });
+                    }
+                  } catch (err) {
+                    console.error('Upload failed', err);
+                  } finally {
+                    setIsUploading(false);
+                  }
+                }}
+                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
               />
+              <div className="flex flex-col items-center justify-center py-8">
+                {isUploading ? (
+                  <div className="w-8 h-8 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
+                ) : formData.poster_url ? (
+                  <img src={formData.poster_url} alt="Preview" className="h-40 w-full object-cover rounded-xl shadow-sm" />
+                ) : (
+                  <>
+                    <div className="w-12 h-12 bg-white text-emerald-600 rounded-full flex items-center justify-center mb-3 group-hover:scale-110 group-hover:bg-emerald-50 transition-all shadow-sm border border-stone-100">
+                      <Plus size={24} />
+                    </div>
+                    <span className="text-sm font-bold text-stone-500">Tap to upload a photo</span>
+                  </>
+                )}
+              </div>
             </div>
-            <div className="space-y-2">
-              <label className="text-sm font-bold text-stone-900 ml-1">Time</label>
-              <input
-                type="time"
-                value={formData.time}
-                onChange={e => setFormData({ ...formData, time: e.target.value })}
-                className="w-full px-5 py-4 bg-white border border-stone-100 rounded-2xl focus:ring-2 focus:ring-emerald-500/10 focus:border-emerald-500 outline-none transition-all shadow-sm"
-              />
-            </div>
-          </div>
-          <div className="space-y-2">
-            <label className="text-sm font-bold text-stone-900 ml-1">Reste probablement jusqu'à</label>
-            <input
-              type="datetime-local"
-              value={formData.estimated_until || ''}
-              onChange={e => setFormData({ ...formData, estimated_until: e.target.value })}
-              className="w-full px-5 py-4 bg-white border border-stone-100 rounded-2xl focus:ring-2 focus:ring-emerald-500/10 focus:border-emerald-500 outline-none transition-all shadow-sm"
-            />
-          </div>
-          <div className="space-y-2">
-            <label className="text-sm font-bold text-stone-900 ml-1">Event Photo URL</label>
-            <input
-              type="text"
-              value={formData.poster_url}
-              onChange={e => setFormData({ ...formData, poster_url: e.target.value })}
-              placeholder="Paste an image link (e.g., from Imgur)"
-              className="w-full px-5 py-4 bg-white border border-stone-100 rounded-2xl focus:ring-2 focus:ring-emerald-500/10 focus:border-emerald-500 outline-none transition-all shadow-sm placeholder:text-stone-300"
-            />
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
@@ -862,7 +861,7 @@ function AddEventScreen({ onBack, onSubmit }: { onBack: () => void, onSubmit: (d
               <select
                 value={formData.type}
                 onChange={e => setFormData({ ...formData, type: e.target.value })}
-                className="w-full px-5 py-4 bg-white border border-stone-100 rounded-2xl focus:ring-2 focus:ring-emerald-500/10 focus:border-emerald-500 outline-none transition-all shadow-sm appearance-none"
+                className="w-full px-5 py-4 bg-stone-50 border border-stone-100 rounded-2xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 focus:bg-white outline-none transition-all shadow-sm appearance-none font-medium"
               >
                 {eventTypes.map(t => <option key={t} value={t}>{t}</option>)}
               </select>
@@ -872,21 +871,25 @@ function AddEventScreen({ onBack, onSubmit }: { onBack: () => void, onSubmit: (d
               <select
                 value={formData.food_certainty}
                 onChange={e => setFormData({ ...formData, food_certainty: e.target.value })}
-                className="w-full px-5 py-4 bg-white border border-stone-100 rounded-2xl focus:ring-2 focus:ring-emerald-500/10 focus:border-emerald-500 outline-none transition-all shadow-sm appearance-none"
+                className="w-full px-5 py-4 bg-stone-50 border border-stone-100 rounded-2xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 focus:bg-white outline-none transition-all shadow-sm appearance-none font-medium"
               >
-                <option value="confirmed">Confirmed (Definitely there)</option>
-                <option value="probable">Probable (Should be some)</option>
-                <option value="unknown">Unknown (Not sure yet)</option>
+                <option value="confirmed">Confirmed 🟢</option>
+                <option value="probable">Probable 🟡</option>
+                <option value="unknown">Unknown ⚪</option>
               </select>
             </div>
           </div>
         </div>
         <button
-          onClick={() => onSubmit(formData)}
-          disabled={!formData.name || !formData.location || !formData.date || !formData.latitude}
-          className="w-full py-5 bg-gradient-to-r from-pink-500 to-orange-500 text-white rounded-[24px] font-bold text-lg shadow-xl shadow-orange-100 hover:opacity-90 transition-all disabled:opacity-50 disabled:shadow-none mt-4"
+          onClick={handleFormSubmit}
+          disabled={!formData.name || !formData.location || formData.latitude === 0 || formData.longitude === 0 || isSubmitting}
+          className="w-full py-5 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-[24px] font-bold text-lg shadow-xl shadow-emerald-200 hover:scale-[1.02] hover:shadow-2xl transition-all disabled:opacity-50 disabled:shadow-none disabled:hover:scale-100 mt-4 flex items-center justify-center gap-2"
         >
-          Share Event
+          {isSubmitting ? (
+            <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+          ) : (
+            'Share Event 🎉'
+          )}
         </button>
         <div className="bg-orange-50 p-4 rounded-2xl flex gap-3 border border-orange-100">
           <div className="w-6 h-6 bg-orange-500 rounded-full flex items-center justify-center text-white shrink-0">
@@ -932,14 +935,14 @@ function DetailsScreen({ event, onBack, onJoin, onComment, onReport }: { event: 
               <button onClick={() => setShowReport(false)} className="flex-1 py-2 bg-stone-100 rounded-xl">
                 Annuler
               </button>
-              <button 
+              <button
                 onClick={() => {
                   if (reportReason.trim()) {
                     onReport(reportReason);
                     setShowReport(false);
                     setReportReason('');
                   }
-                }} 
+                }}
                 className="flex-1 py-2 bg-rose-500 text-white rounded-xl"
               >
                 Envoyer
@@ -1039,11 +1042,10 @@ function DetailsScreen({ event, onBack, onJoin, onComment, onReport }: { event: 
           <button
             onClick={onJoin}
             disabled={isJoined}
-            className={`px-6 py-2 rounded-xl font-bold text-sm transition-all ${
-              isJoined
-                ? 'bg-emerald-100 text-emerald-600 cursor-default'
-                : 'bg-emerald-600 text-white shadow-lg shadow-emerald-200 hover:bg-emerald-700'
-            }`}
+            className={`px-6 py-2 rounded-xl font-bold text-sm transition-all ${isJoined
+              ? 'bg-emerald-100 text-emerald-600 cursor-default'
+              : 'bg-emerald-600 text-white shadow-lg shadow-emerald-200 hover:bg-emerald-700'
+              }`}
           >
             {isJoined ? 'Inscrit' : "J'y vais !"}
           </button>
@@ -1053,7 +1055,7 @@ function DetailsScreen({ event, onBack, onJoin, onComment, onReport }: { event: 
             <MessageSquare size={14} />
             Commentaires ({event.comments.length})
           </h3>
-         
+
           <div className="flex gap-2">
             <input
               type="text"
@@ -1099,9 +1101,9 @@ function getDistance(
   const dLat = (lat2 - lat1) * Math.PI / 180;
   const dLon = (lon2 - lon1) * Math.PI / 180;
   const a =
-    Math.sin(dLat/2) * Math.sin(dLat/2) +
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
     Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-    Math.sin(dLon/2) * Math.sin(dLon/2);
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    Math.sin(dLon / 2) * Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   return R * c;
 }

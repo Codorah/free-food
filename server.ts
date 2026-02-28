@@ -4,12 +4,30 @@ import Database from "better-sqlite3";
 import path from "path";
 import { fileURLToPath } from "url";
 import fs from "fs";
+import multer from "multer";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const dbPath = process.env.VERCEL ? path.join("/tmp", "freefood.db") : "freefood.db";
 const db = new Database(dbPath);
+
+const uploadDir = path.join(__dirname, "public", "uploads");
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
+
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, uploadDir)
+  },
+  filename: function (req, file, cb) {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
+    cb(null, uniqueSuffix + path.extname(file.originalname))
+  }
+})
+
+const upload = multer({ storage: storage })
 
 // Initialize database
 db.exec(`
@@ -70,7 +88,7 @@ if (eventCount.count === 0) {
     path.join(__dirname, "data", "initial_events.json"),
     path.join(process.cwd(), "src", "data", "initial_events.json")
   ];
-  
+
   let jsonPath = "";
   for (const p of possiblePaths) {
     if (fs.existsSync(p)) {
@@ -85,19 +103,19 @@ if (eventCount.count === 0) {
       INSERT INTO events (name, location, latitude, longitude, date, time, type, food_certainty, description, poster_url, reporter_email)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `);
-    
+
     for (const event of initialData) {
       insert.run(
-        event.name, 
-        event.location, 
-        event.latitude, 
-        event.longitude, 
-        event.date, 
-        event.time, 
-        event.type, 
-        event.food_certainty, 
-        event.description, 
-        event.poster_url, 
+        event.name,
+        event.location,
+        event.latitude,
+        event.longitude,
+        event.date,
+        event.time,
+        event.type,
+        event.food_certainty,
+        event.description,
+        event.poster_url,
         event.reporter_email
       );
     }
@@ -108,8 +126,16 @@ if (eventCount.count === 0) {
 async function createServer() {
   const app = express();
   app.use(express.json({ limit: '10mb' }));
+  app.use('/uploads', express.static(uploadDir));
 
   // API Routes
+  app.post('/api/upload', upload.single('image'), (req, res) => {
+    if (!req.file) {
+      return res.status(400).json({ error: 'No file uploaded' });
+    }
+    const url = `/uploads/${req.file.filename}`;
+    res.json({ url });
+  });
   app.get("/api/events", (req, res) => {
     const events = db.prepare(`
       SELECT e.*, 
@@ -123,10 +149,10 @@ async function createServer() {
   app.get("/api/events/:id", (req, res) => {
     const event = db.prepare("SELECT * FROM events WHERE id = ?").get(req.params.id);
     if (!event) return res.status(404).json({ error: "Event not found" });
-    
+
     const participants = db.prepare("SELECT user_email FROM participants WHERE event_id = ?").all(req.params.id);
     const comments = db.prepare("SELECT * FROM comments WHERE event_id = ? ORDER BY created_at DESC").all(req.params.id);
-    
+
     res.json({ ...event, participants, comments });
   });
 
@@ -142,7 +168,7 @@ async function createServer() {
   app.post("/api/events/:id/join", (req, res) => {
     const { user_email } = req.body;
     const event_id = req.params.id;
-    
+
     const existing = db.prepare("SELECT id FROM participants WHERE event_id = ? AND user_email = ?").get(event_id, user_email);
     if (existing) return res.json({ success: true, message: "Already joined" });
 
